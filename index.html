@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Campaign Significance!</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Campaign Significance!">
+  <meta name="author" content="Ben Gaff">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Campaign Significance!</h1>
+    <h2>Course Project for Coursera Developing Data Products Course - May 2015</h2>
+    <p>Ben Gaff<br/></p>
+  </hgroup>
+    <a href="https://github.com/bengaff/CampaignSignificance/zipball/gh-pages" class="example">
+     Download
+    </a>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Has My Marketing Campaign Test Been Successful?</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>A/B Testing &amp; Test vs. Control campaigns are essential tools to understand &amp; improve campaign performance<br></li>
+<li>However, we can&#39;t only look at relative response rates between campaign cells when evaluating performance...<br>
+
+<ul>
+<li>We need to understand if variation is significant [Commonly with 95% confidence]</li>
+</ul></li>
+<li>A Google <a href="https://www.google.com.hk/search?q=marketing+campaign+significance+test&amp;oq=marketing+campaign+significance">search</a> shows quite a few online tools that can help such as <a href="http://www.rrdonnelley.com/RMS/ServicesResources/TestResults.asp">RR-Donnelly</a>, <a href="http://www.zettasphere.com/abcalculator/">zettasphere</a>,etc... BUT:
+
+<ul>
+<li>DON&#39;T provide a way to evaluate more than one Test vs. Control combination at a time<br></li>
+<li>DON&#39;T provide an intuitive, graphical way of understanding the underlying statistical concepts that are being used to create inference conclusions<br></li>
+</ul></li>
+<li><span style="color:#DC143C; font-weight: bold"> <a href="http://bengaff.shinyapps.io/TryFINAL/">The Campaign Significance!</a> application provides an easy, intuitive way for people to understand whether the relative performance of Test vs. Control cells in past or planned campaigns is significantly different </span></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Shiny To The Rescue!</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><a href="http://shiny.rstudio.com/">Shiny</a>, from RStudio, provides a powerful tool to help create a solution using the power of R  </p>
+
+<p>1 - Users can enter information/parameters about their campaigns  </p>
+
+<pre><code class="r"># Example code in Shiny ui.R file
+fileInput(&#39;file1&#39;, &#39;Choose CSV File&#39;,   # Allow user to select csv file to upload
+    accept=c(&#39;text/csv&#39;, &#39;text/comma-separated-values,text/plain&#39;, &#39;.csv&#39;))
+</code></pre>
+
+<p>2 - Shiny feeds this to R, which can make calculations using the inputs  </p>
+
+<pre><code class="r"># Example code in Shiny server.R file
+rawData &lt;- reactive({     # Save raw data either from example or file to upload
+    inFile &lt;- input$file1 # Create object to store details of file to upload
+    if (is.null(inFile)) exampleData else
+        read.csv(inFile$datapath, header=TRUE, sep=input$sep, quote=input$quote)})
+</code></pre>
+
+<p>3 - Analysis based on these calculations is passed back from R and displayed to the user<br>
+4 - The user can easily &amp; quickly change parameters - new results displayed in real time</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Using The <em>Power</em> of R...</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>In the <span style="color:#DC143C; font-weight: bold">Campaign Significance!</span> application:<br>
+1 - The information entered by the user is passed to R<br>
+2 - R performs statistical analysis based on the parameters shown  </p>
+
+<pre><code class="r"># Example code in Shiny server.R file
+controlVar &lt;- (controlpHat*(1-controlpHat))/rawDataFrame$Control.Volume
+testVar &lt;- (testpHat*(1-testpHat))/rawDataFrame$Test.Volume
+differenceSE &lt;- sqrt(controlVar+testVar)
+</code></pre>
+
+<p>3 - The <a href="ggplot2.org">ggplot2</a> package is used to create probability density plots to better visualise significance<br>
+Show example code &amp; chart
+<img src="assets/fig/unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>The Solution: Campaign Significance!</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><a href="http://bengaff.shinyapps.io/TryFINAL/">The Campaign Significance!</a> application provides an easy, intuitive way for people to understand relative performance of Test vs. Control cells in past or planned campaigns:<br></li>
+</ul>
+
+<p><span style="color:#DC143C; font-weight: bold">FILE UPLOAD</span>: Upload &amp; evaluate response information in CSV format for completed campaigns<br>
+<span style="color:#DC143C; font-weight: bold">SCENARIO TEST</span>: Specify &amp; evaluate response for a planned Test vs. Control campaign  </p>
+
+<div style='text-align: center;'>
+    <img height='300' src='CombinedScreenShot.png' />
+</div>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Has My Marketing Campaign Test Been Successful?'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Shiny To The Rescue!'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Using The <em>Power</em> of R...'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='The Solution: Campaign Significance!'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
